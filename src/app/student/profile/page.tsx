@@ -92,16 +92,16 @@ export default async function ProfilePage() {
         </h2>
         {memberships && memberships.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {(memberships as { classes: { id: string; name: string; join_code: string }[] }[]).flatMap(
-              (m) => m.classes.map((cls) => (
-                <div key={cls.id} className="card flex items-center justify-between">
-                  <span className="font-bold text-brand-blue">{cls.name}</span>
+            {(memberships as unknown as { classes: { id: string; name: string; join_code: string } | null }[])
+              .filter((m) => m.classes != null)
+              .map((m) => (
+                <div key={m.classes!.id} className="card flex items-center justify-between">
+                  <span className="font-bold text-brand-blue">{m.classes!.name}</span>
                   <span className="text-sm text-gray-500 font-mono">
-                    {cls.join_code}
+                    {m.classes!.join_code}
                   </span>
                 </div>
-              ))
-            )}
+              ))}
           </div>
         ) : (
           <div className="callout">
