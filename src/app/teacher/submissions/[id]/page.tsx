@@ -53,6 +53,19 @@ export default async function SubmissionDetailPage({
     .eq("exercise_id", exercise.id)
     .order("attempt_number", { ascending: true });
 
+  // Generate signed URLs for audio paths (bucket is private)
+  const attemptsWithUrls = await Promise.all(
+    (allAttempts ?? []).map(async (attempt) => {
+      if (attempt.audio_url) {
+        const { data } = await supabase.storage
+          .from("recordings")
+          .createSignedUrl(attempt.audio_url, 3600);
+        return { ...attempt, audio_url: data?.signedUrl ?? null };
+      }
+      return attempt;
+    })
+  );
+
   return (
     <div className="flex flex-col gap-6">
       {/* Breadcrumb */}
@@ -107,10 +120,10 @@ export default async function SubmissionDetailPage({
           className="text-xl text-brand-blue mb-3"
           style={{ fontFamily: "var(--font-bebas)" }}
         >
-          ALLE POGINGEN ({allAttempts?.length ?? 0})
+          ALLE POGINGEN ({attemptsWithUrls.length})
         </h2>
         <div className="flex flex-col gap-3">
-          {(allAttempts ?? []).map((attempt) => {
+          {attemptsWithUrls.map((attempt) => {
             const isCurrent = attempt.id === id;
             return (
               <div

@@ -120,11 +120,8 @@ export default function AudioRecorder({
 
       if (uploadError) throw uploadError;
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("recordings").getPublicUrl(filename);
-
-      await createSubmission(exerciseId, publicUrl, selfScore);
+      // Store the storage path (not a public URL); signed URLs are generated server-side
+      await createSubmission(exerciseId, filename, selfScore);
       setState("submitted");
       onSubmitted?.();
     } catch (err) {

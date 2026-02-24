@@ -50,9 +50,22 @@ export default async function LessonPage({
     .in("exercise_id", exerciseIds)
     .order("attempt_number", { ascending: true });
 
+  // Generate signed URLs for audio paths (bucket is private)
+  const submissionsWithUrls: Submission[] = await Promise.all(
+    (submissions ?? []).map(async (sub) => {
+      if (sub.audio_url) {
+        const { data } = await supabase.storage
+          .from("recordings")
+          .createSignedUrl(sub.audio_url, 3600);
+        return { ...sub, audio_url: data?.signedUrl ?? null };
+      }
+      return sub;
+    })
+  );
+
   // Group submissions by exercise
   const submissionsByExercise: Record<string, Submission[]> = {};
-  for (const sub of submissions ?? []) {
+  for (const sub of submissionsWithUrls) {
     if (!submissionsByExercise[sub.exercise_id]) {
       submissionsByExercise[sub.exercise_id] = [];
     }
