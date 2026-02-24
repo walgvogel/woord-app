@@ -46,12 +46,12 @@ export default function TeacherNav({ profile }: { profile: Profile }) {
               {link.label}
             </Link>
           ))}
-          <span className="text-sm text-white/70 hidden sm:block">
+          <span className="text-sm font-semibold text-white hidden sm:block">
             {profile.display_name}
           </span>
           <button
             onClick={handleSignOut}
-            className="text-sm text-white/70 hover:text-white transition"
+            className="text-sm font-semibold px-3 py-1 rounded-lg text-white hover:bg-white/10 transition"
           >
             Uitloggen
           </button>
