@@ -52,7 +52,7 @@ export default async function LessonPage({
 
   // Generate signed URLs for audio paths (bucket is private)
   // Old submissions may have a full public URL; skip those.
-  const submissionsWithUrls: Submission[] = await Promise.all(
+  const submissionsWithUrls = (await Promise.all(
     (submissions ?? []).map(async (sub) => {
       if (sub.audio_url && !sub.audio_url.startsWith("http")) {
         const { data } = await supabase.storage
@@ -62,7 +62,7 @@ export default async function LessonPage({
       }
       return sub;
     })
-  );
+  )) as Submission[];
 
   // Group submissions by exercise
   const submissionsByExercise: Record<string, Submission[]> = {};
