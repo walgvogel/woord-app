@@ -1,6 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+// The proxy only refreshes the session token.
+// All auth redirects are handled by the individual page layouts.
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -25,66 +27,8 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-
-  // Public paths – allow through
-  if (
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/auth/callback") ||
-    pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon")
-  ) {
-    if (user && pathname.startsWith("/login")) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-
-      if (profile?.role === "teacher") {
-        return NextResponse.redirect(
-          new URL("/teacher/dashboard", request.url)
-        );
-      }
-      if (profile?.role === "student") {
-        return NextResponse.redirect(
-          new URL("/student/dashboard", request.url)
-        );
-      }
-    }
-    return supabaseResponse;
-  }
-
-  // All other paths require auth
-  if (!user) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .single();
-
-  // New user without profile – send to login to complete setup
-  if (!profile) {
-    if (pathname !== "/login") {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-    return supabaseResponse;
-  }
-
-  // Role-based guard
-  if (pathname.startsWith("/teacher") && profile.role !== "teacher") {
-    return NextResponse.redirect(new URL("/student/dashboard", request.url));
-  }
-  if (pathname.startsWith("/student") && profile.role !== "student") {
-    return NextResponse.redirect(new URL("/teacher/dashboard", request.url));
-  }
+  // Refresh the session if expired – required for Server Components
+  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
