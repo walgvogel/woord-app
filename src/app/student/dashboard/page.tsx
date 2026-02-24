@@ -82,8 +82,9 @@ export default async function StudentDashboard() {
         {memberships && memberships.length > 0 ? (
           <p className="text-white/80 text-sm mt-1">
             Klas:{" "}
-            {(memberships as { classes: { name: string }[] }[])
-              .flatMap((m) => m.classes.map((c) => c.name))
+            {(memberships as { classes: { name: string } | null }[])
+              .map((m) => m.classes?.name)
+              .filter(Boolean)
               .join(", ")}
           </p>
         ) : (
