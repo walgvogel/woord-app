@@ -51,9 +51,10 @@ export default async function LessonPage({
     .order("attempt_number", { ascending: true });
 
   // Generate signed URLs for audio paths (bucket is private)
+  // Old submissions may have a full public URL; skip those.
   const submissionsWithUrls: Submission[] = await Promise.all(
     (submissions ?? []).map(async (sub) => {
-      if (sub.audio_url) {
+      if (sub.audio_url && !sub.audio_url.startsWith("http")) {
         const { data } = await supabase.storage
           .from("recordings")
           .createSignedUrl(sub.audio_url, 3600);
