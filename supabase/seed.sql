@@ -48,7 +48,23 @@ Onthoud dat je tong en je lippen een spier zijn. Net zoals je naar de fitness ga
 
 ## Lipronding
 
-Klinkers zoals **O** en **U** spreek je uit met naar voren getuite lippen — dat noemen we lipronding. Maar voor een krachtige, heldere klank leer je die lipronding bewust loslaten: de mond staat opener en de klank klinkt helderder en vrijer. Overdrijf de mondstand en voel het verschil!
+Zie je een **O**, **U** of een tweeklank waar een O of U in zit? Tuit dan je lippen alsof ze een O vormen. Zo duw je de letter meer naar buiten en klink je helderder.
+
+> **Belangrijk!** Doe dit niet bij andere letters, anders lijk je net een vis.
+
+### O (als in 'lot')
+
+**Mondstand:** De lippen zijn lichtjes gerond, de tong ligt iets lager in de mond dan bij de I.
+
+**Aandachtspunt:** In het West-Vlaams wordt de korte O soms meer gesloten uitgesproken, bijna als een U (Mus i.p.v. Mos).
+
+### U (als in 'put')
+
+**Mondstand:** De lippen zijn licht gerond, maar de mondopening blijft klein. De tong is iets omhoog en naar achteren geplaatst.
+
+**Aandachtspunt:** De U wordt vaak te gesloten en achteraan gevormd (uh) — duw hem meer naar voren!
+
+![klinkers O en U](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/uitspraak-klinkers-4.png)
 
 ![gymnast](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-gymnast.png)$$, 1
 FROM modules WHERE slug = 'krachtige-stem';
