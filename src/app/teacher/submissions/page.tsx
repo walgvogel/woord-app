@@ -100,7 +100,7 @@ export default async function SubmissionsPage({
             const exercise = sub.exercises as {
               title: string;
               type: string;
-              lessons: { title: string; modules: { title: string; icon: string | null } };
+              lessons: { title: string; modules: { title: string; icon: string | null } } | null;
             };
 
             return (
@@ -125,9 +125,9 @@ export default async function SubmissionsPage({
                     {profile.display_name ?? "Leerling"}
                   </p>
                   <p className="text-sm text-gray-600 truncate">
-                    {exercise.lessons.modules.icon}{" "}
-                    {exercise.lessons.modules.title} →{" "}
-                    {exercise.lessons.title} → {exercise.title}
+                    {exercise.lessons
+                      ? `${exercise.lessons.modules.icon} ${exercise.lessons.modules.title} → ${exercise.lessons.title} → ${exercise.title}`
+                      : `📝 Eigen opdracht → ${exercise.title}`}
                   </p>
                   <p className="text-xs text-gray-400 mt-0.5">
                     Poging {sub.attempt_number} •{" "}

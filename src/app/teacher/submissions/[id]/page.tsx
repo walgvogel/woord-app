@@ -36,7 +36,7 @@ export default async function SubmissionDetailPage({
     title: string;
     type: string;
     instructions: string | null;
-    lessons: { title: string; modules: { title: string; icon: string | null; slug: string } };
+    lessons: { title: string; modules: { title: string; icon: string | null; slug: string } } | null;
   };
   const feedbacks = submission.feedback as {
     id: string;
@@ -101,8 +101,9 @@ export default async function SubmissionDetailPage({
               {(profile.display_name ?? "Leerling").toUpperCase()}
             </h1>
             <p className="text-sm text-gray-500">
-              {exercise.lessons.modules.icon} {exercise.lessons.modules.title} →{" "}
-              {exercise.lessons.title}
+              {exercise.lessons
+                ? `${exercise.lessons.modules.icon} ${exercise.lessons.modules.title} → ${exercise.lessons.title}`
+                : "📝 Eigen opdracht"}
             </p>
           </div>
         </div>
