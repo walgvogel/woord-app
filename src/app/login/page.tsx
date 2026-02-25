@@ -40,7 +40,7 @@ export default function LoginPage() {
           WOORD
         </h1>
         <p className="mt-3 text-base text-gray-600 font-medium">
-          Stemoefeeningen voor de klas
+          Stemoefeningen voor de klas
         </p>
       </div>
 

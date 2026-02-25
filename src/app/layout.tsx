@@ -17,7 +17,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Audio Woord",
-  description: "Stemoefeeningen voor middelbare scholieren – Emma Ducheyne & Emi Catteeuw",
+  description: "Stemoefeningen voor middelbare scholieren – Emma Ducheyne & Emi Catteeuw",
 };
 
 export const viewport: Viewport = {
