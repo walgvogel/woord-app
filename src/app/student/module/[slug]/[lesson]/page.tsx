@@ -174,7 +174,7 @@ export default async function LessonPage({
 
                   {exercise.instructions && (
                     <div className="callout ml-11">
-                      <p className="text-sm">{exercise.instructions}</p>
+                      <p className="text-sm whitespace-pre-wrap">{exercise.instructions}</p>
                     </div>
                   )}
 
