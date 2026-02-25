@@ -76,6 +76,51 @@ SELECT l.id, 'Pittigheidstest', 'self_assessment',
 FROM lessons l JOIN modules m ON m.id = l.module_id
 WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
 
+INSERT INTO exercises (lesson_id, title, type, instructions, "order")
+SELECT l.id, 'Liprondingsoefening', 'recording',
+$$1. De korte O en lange OO
+Woorden (kort): pot, klok, bos, hond, trots
+Woorden (lang): boom, rood, brood, poot, droom
+
+Zin 1 (O): De stomme hond sprong op de ronde ton.
+Zin 2 (OO): Oom Joop kookte rode kool voor zijn zonen.
+Zin 3 (Mix): De grote koster kocht een rode klok.
+
+2. De korte U en lange UU
+Woorden (kort): bus, put, mug, brug, druk
+Woorden (lang): muur, vuur, puur, stuur, zuur
+
+Zin 1 (U): De mug zoemt heel druk in de volle bus.
+Zin 2 (UU): Ruud tuurt over de stenen muur naar het vuur.
+Zin 3 (Mix): De zure buurman stuitert op de kruk.
+
+3. De OE
+Woorden: boek, stoel, koe, snoep, roepen
+
+Zin 1: De boer zoekt een goede schoen voor zijn voet.
+Zin 2: De moedige poedel roept naar de koeien.
+
+4. De EU
+Woorden: neus, deur, reus, leuk, kleur
+
+Zin 1: De reus leunt tegen de gesloten deur.
+Zin 2: De speurder snuift de geur van de nieuwe beuk.
+
+5. De UI
+Woorden: huis, muis, uil, buiten, fluit
+
+Zin 1: Buiten huilt de bruine uil bij het huis.
+Zin 2: De luie muis kruipt door het vuile luik.
+
+6. De AU / OU
+(Klank is hetzelfde, spelling is anders)
+Woorden: koud, hout, blauw, pauw, vrouw
+
+Zin 1: De blauwe pauw loopt in de kou over het hout.
+Zin 2: De trotse vrouw vouwt de gouden mouw.$$, 2
+FROM lessons l JOIN modules m ON m.id = l.module_id
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+
 -- ----------------------------------------------------------
 -- Les 1.2: Pittig pittiger pittigst
 -- ----------------------------------------------------------
