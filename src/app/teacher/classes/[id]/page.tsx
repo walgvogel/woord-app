@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import ProgressBar from "@/components/ProgressBar";
 import CopyButton from "./CopyButton";
+import ClassExercisesSection from "./ClassExercisesSection";
 
 export default async function ClassDetailPage({
   params,
@@ -34,7 +35,14 @@ export default async function ClassDetailPage({
 
   const { count: totalExercises } = await supabase
     .from("exercises")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .is("class_id", null);
+
+  const { data: classExercises } = await supabase
+    .from("exercises")
+    .select("id, title, instructions")
+    .eq("class_id", id)
+    .order("created_at", { ascending: true });
 
   // Fetch all submissions for these students
   const studentIds = (memberships ?? []).map((m) => m.student_id);
@@ -156,6 +164,12 @@ export default async function ClassDetailPage({
           </div>
         )}
       </section>
+
+      {/* Eigen teksten */}
+      <ClassExercisesSection
+        classId={id}
+        initialExercises={classExercises ?? []}
+      />
     </div>
   );
 }

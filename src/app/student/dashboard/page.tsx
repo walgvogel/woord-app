@@ -29,7 +29,7 @@ export default async function StudentDashboard() {
     supabase.from("badges").select("*"),
     supabase
       .from("class_memberships")
-      .select("classes(name)")
+      .select("class_id, classes(name)")
       .eq("student_id", user.id),
   ]);
 
@@ -147,6 +147,36 @@ export default async function StudentDashboard() {
           ))}
         </div>
       </section>
+
+      {/* Opdrachten van leerkracht */}
+      {memberships && memberships.length > 0 && (
+        <section>
+          <h2
+            className="text-2xl text-brand-blue mb-3"
+            style={{ fontFamily: "var(--font-bebas)" }}
+          >
+            OPDRACHTEN
+          </h2>
+          <a
+            href="/student/opdrachten"
+            className="card flex items-center gap-4 hover:shadow-md transition group"
+          >
+            <span className="text-3xl">📝</span>
+            <div className="flex-1 min-w-0">
+              <p
+                className="font-bold text-brand-blue group-hover:text-pink transition"
+                style={{ fontFamily: "var(--font-bebas)", fontSize: "1.1rem" }}
+              >
+                OPDRACHTEN VAN JE LEERKRACHT
+              </p>
+              <p className="text-xs text-gray-500">
+                Bekijk en neem de teksten van je leerkracht op
+              </p>
+            </div>
+            <span className="text-brand-blue text-xl shrink-0">→</span>
+          </a>
+        </section>
+      )}
 
       {/* Badges */}
       <section>

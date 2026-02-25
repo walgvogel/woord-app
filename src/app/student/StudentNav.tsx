@@ -39,6 +39,16 @@ export default function StudentNav({ profile }: { profile: Profile }) {
             Home
           </Link>
           <Link
+            href="/student/opdrachten"
+            className={`text-sm font-semibold px-3 py-1 rounded-lg transition ${
+              pathname === "/student/opdrachten"
+                ? "bg-pink text-white"
+                : "hover:bg-white/10"
+            }`}
+          >
+            Opdrachten
+          </Link>
+          <Link
             href="/student/profile"
             className={`text-sm font-semibold px-3 py-1 rounded-lg transition ${
               pathname === "/student/profile"

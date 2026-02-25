@@ -45,6 +45,7 @@ export async function createSubmission(
   await checkAndAwardBadges(user.id);
 
   revalidatePath("/student/dashboard");
+  revalidatePath("/student/opdrachten");
 
   return data;
 }

@@ -42,11 +42,14 @@ export interface Lesson {
 
 export interface Exercise {
   id: string;
-  lesson_id: string;
+  lesson_id: string | null;
+  class_id: string | null;
+  created_by: string | null;
   title: string;
   type: ExerciseType;
   instructions: string | null;
   order: number;
+  created_at: string;
 }
 
 export interface Submission {
