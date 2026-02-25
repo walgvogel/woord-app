@@ -44,7 +44,7 @@ $$Spreken is topsport en dat vraagt training. Stel een trainingsschema op voor j
 
 Onthoud dat je tong en je lippen een spier zijn. Net zoals je naar de fitness gaat voor stevige biceps, kan je ook je tong en lippen trainen!
 
-> **Pittigheid:** Zorg dat je het verschil hoort tussen verschillende klanken en dat je die zoveel mogelijk vooraan plaatst. Zo klinken je medeklinkers krachtiger en word je verstaanbaarder!
+> **Pittigheid:** Binnensmonds mompelen? Liever niet! Denk aan een beatboxer en geef je medeklinkers kracht door ze actief en scherp uit te spreken vooraan bij je lippen en tanden. Zo krijgt je stem meer power en luisteren mensen sneller naar wat je zegt.
 
 ## Lipronding
 
