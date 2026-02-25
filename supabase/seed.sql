@@ -37,20 +37,18 @@ INSERT INTO modules (slug, title, icon, "order") VALUES
 -- ----------------------------------------------------------
 
 INSERT INTO lessons (module_id, slug, title, content, "order")
-SELECT id, 'oefening-baart-kunst', 'Oefening baart kunst',
+SELECT id, 'oefening-baart-kunst', 'Jouw stem is een spier — train hem!',
 $$Spreken is topsport en dat vraagt training. Stel een trainingsschema op voor jezelf en maak het haalbaar. Het is alsof je een nieuwe taal leert. Wanneer je Spaans leert spreken moet je ook leren lispelen of zoals bij Frans je rollende Rrrrrr zoeken. Hoe krachtiger je articuleert, hoe verstaanbaarder je bent!
-
-## Voorwaarden voor een krachtige stem
-
-- Lucht nodig = **ademhaling**
-- Lucht wordt omgezet in geluid = **stemplaatsing**
-- Geluid kan vrij uitstromen = **mondbeeld**
 
 ## Spreek pittig!
 
 Onthoud dat je tong en je lippen een spier zijn. Net zoals je naar de fitness gaat voor stevige biceps, kan je ook je tong en lippen trainen!
 
 > **Pittigheid:** Zorg dat je het verschil hoort tussen verschillende klanken en dat je die zoveel mogelijk vooraan plaatst. Zo klinken je medeklinkers krachtiger en word je verstaanbaarder!
+
+## Lipronding
+
+Klinkers zoals **O** en **U** spreek je uit met naar voren getuite lippen — dat noemen we lipronding. Maar voor een krachtige, heldere klank leer je die lipronding bewust loslaten: de mond staat opener en de klank klinkt helderder en vrijer. Overdrijf de mondstand en voel het verschil!
 
 ![gymnast](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-gymnast.png)$$, 1
 FROM modules WHERE slug = 'krachtige-stem';
