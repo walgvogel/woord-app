@@ -48,7 +48,7 @@ export default async function SubmissionDetailPage({
   // All attempts for this student + exercise
   const { data: allAttempts } = await supabase
     .from("submissions")
-    .select("id, attempt_number, audio_url, self_score, completed_at")
+    .select("id, attempt_number, audio_url, self_score, reflection_text, completed_at")
     .eq("student_id", submission.student_id)
     .eq("exercise_id", exercise.id)
     .order("attempt_number", { ascending: true });
@@ -166,6 +166,13 @@ export default async function SubmissionDetailPage({
                       readonly
                       size="sm"
                     />
+                  </div>
+                )}
+
+                {(attempt as typeof attempt & { reflection_text?: string | null }).reflection_text && (
+                  <div className="mt-2 callout text-sm text-gray-700">
+                    <p className="text-xs font-bold text-brand-blue mb-1">Reflectie leerling</p>
+                    <p>{(attempt as typeof attempt & { reflection_text?: string | null }).reflection_text}</p>
                   </div>
                 )}
 

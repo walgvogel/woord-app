@@ -29,6 +29,7 @@ export default function AudioRecorder({
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
   const [localAudioUrl, setLocalAudioUrl] = useState<string | null>(null);
   const [selfScore, setSelfScore] = useState(3);
+  const [reflectionText, setReflectionText] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
 
@@ -121,7 +122,7 @@ export default function AudioRecorder({
       if (uploadError) throw uploadError;
 
       // Store the storage path (not a public URL); signed URLs are generated server-side
-      await createSubmission(exerciseId, filename, selfScore);
+      await createSubmission(exerciseId, filename, selfScore, reflectionText.trim() || undefined);
       setState("submitted");
       onSubmitted?.();
     } catch (err) {
@@ -162,7 +163,7 @@ export default function AudioRecorder({
                     style={{ minWidth: 0 }}
                   />
                 )}
-                {sub.self_score !== null && (
+                {sub.self_score !== null && sub.self_score > 0 && (
                   <span className="text-xs shrink-0">
                     {"⭐".repeat(sub.self_score)}
                   </span>
@@ -238,6 +239,20 @@ export default function AudioRecorder({
                     Hoe beoordeel je jezelf?
                   </p>
                   <StarRating value={selfScore} onChange={setSelfScore} />
+                </div>
+
+                {/* Reflection */}
+                <div>
+                  <p className="text-sm font-semibold text-gray-700 mb-2">
+                    Reflectie <span className="text-gray-400 font-normal">(optioneel)</span>
+                  </p>
+                  <textarea
+                    value={reflectionText}
+                    onChange={(e) => setReflectionText(e.target.value)}
+                    placeholder="Wat ging goed? Wat wil je verbeteren?"
+                    rows={3}
+                    className="w-full rounded-xl border-2 border-gray-200 px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:border-brand-blue transition"
+                  />
                 </div>
 
                 {/* Action buttons */}

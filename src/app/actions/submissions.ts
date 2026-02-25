@@ -7,7 +7,8 @@ import { revalidatePath } from "next/cache";
 export async function createSubmission(
   exerciseId: string,
   audioUrl: string,
-  selfScore: number
+  selfScore: number,
+  reflectionText?: string
 ) {
   const supabase = await createClient();
   const {
@@ -33,6 +34,7 @@ export async function createSubmission(
       attempt_number: attemptNumber,
       audio_url: audioUrl,
       self_score: selfScore,
+      reflection_text: reflectionText ?? null,
     })
     .select()
     .single();

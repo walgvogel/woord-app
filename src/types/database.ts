@@ -56,6 +56,7 @@ export interface Submission {
   attempt_number: number;
   audio_url: string | null;
   self_score: number | null;
+  reflection_text: string | null;
   completed_at: string;
 }
 
