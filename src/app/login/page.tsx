@@ -1,81 +1,26 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: Record<string, unknown>) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
+import { useState } from "react";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
-  useEffect(() => {
-    const handleCredential = async (response: { credential: string }) => {
-      setLoading(true);
-      setError(null);
-      const supabase = createClient();
-
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: "google",
-        token: response.credential,
-      });
-
-      if (error || !data.user) {
-        setError("Inloggen mislukt. Probeer opnieuw.");
-        setLoading(false);
-        return;
-      }
-
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
-
-      router.push(
-        profile?.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard"
-      );
-    };
-
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      window.google?.accounts.id.initialize({
-        client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-        callback: handleCredential,
-        use_fedcm_for_prompt: true,
-      });
-    };
-    document.head.appendChild(script);
-
-    return () => {
-      if (document.head.contains(script)) document.head.removeChild(script);
-    };
-  }, [router]);
-
-  const handleGoogleLogin = () => {
-    if (!window.google) {
-      setError("Google laden mislukt. Herlaad de pagina.");
-      return;
-    }
+  const handleGoogleLogin = async () => {
     setLoading(true);
     setError(null);
-    window.google.accounts.id.prompt();
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      setError("Inloggen mislukt. Probeer opnieuw.");
+      setLoading(false);
+    }
   };
 
   return (
