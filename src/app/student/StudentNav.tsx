@@ -60,6 +60,7 @@ export default function StudentNav({ profile }: { profile: Profile }) {
           </Link>
           <button
             onClick={handleSignOut}
+            style={{ cursor: "pointer" }}
             className="text-sm font-semibold px-3 py-1 rounded-lg text-white hover:bg-white/10 transition"
           >
             Uitloggen

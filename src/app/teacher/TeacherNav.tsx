@@ -46,11 +46,19 @@ export default function TeacherNav({ profile }: { profile: Profile }) {
               {link.label}
             </Link>
           ))}
-          <span className="text-sm font-semibold text-white hidden sm:block">
-            {profile.display_name}
-          </span>
+          <Link
+            href="/teacher/profile"
+            className={`text-sm font-semibold px-3 py-1 rounded-lg transition ${
+              pathname === "/teacher/profile"
+                ? "bg-pink text-white"
+                : "hover:bg-white/10"
+            }`}
+          >
+            {profile.display_name ?? "Profiel"}
+          </Link>
           <button
             onClick={handleSignOut}
+            style={{ cursor: "pointer" }}
             className="text-sm font-semibold px-3 py-1 rounded-lg text-white hover:bg-white/10 transition"
           >
             Uitloggen
