@@ -15,6 +15,11 @@ export async function createClassExercise(
 
   if (!user) throw new Error("Not authenticated");
 
+  if (!title?.trim() || title.length > 255)
+    throw new Error("Titel moet 1-255 tekens zijn");
+  if (instructions && instructions.length > 5000)
+    throw new Error("Instructies mogen max 5000 tekens zijn");
+
   const { data, error } = await supabase
     .from("exercises")
     .insert({
@@ -49,6 +54,11 @@ export async function updateClassExercise(
   } = await supabase.auth.getUser();
 
   if (!user) throw new Error("Not authenticated");
+
+  if (!title?.trim() || title.length > 255)
+    throw new Error("Titel moet 1-255 tekens zijn");
+  if (instructions && instructions.length > 5000)
+    throw new Error("Instructies mogen max 5000 tekens zijn");
 
   const { error } = await supabase
     .from("exercises")

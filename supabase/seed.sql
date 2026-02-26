@@ -857,7 +857,7 @@ $$Elke klinker vraagt om een andere mondstand. Twee sleutelwoorden: **openen** e
 
 **Mondstand:** De lippen zijn licht gerond, maar de mondopening blijft klein. De tong is iets omhoog en naar achteren geplaatst.
 
-**Aandachtspunt:** De "U" wordt vaak als een meer gesloten, achteraan gevormde klank uitgesproken (uh) — "Muhs" ipv. "Mus".
+**Aandachtspunt:** De "U" wordt vaak als een meer gesloten, achteraan gevormde klank uitgesproken (uh) — "Muhs" i.p.v. "Mus".
 
 ![klinker u](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/uitspraak-klinkers-5.png)
 

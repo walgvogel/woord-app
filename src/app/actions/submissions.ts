@@ -17,6 +17,28 @@ export async function createSubmission(
 
   if (!user) throw new Error("Not authenticated");
 
+  // Verify student has access to this exercise:
+  // - curriculum exercises (class_id IS NULL) are open to all
+  // - class exercises require class membership
+  const { data: exercise } = await supabase
+    .from("exercises")
+    .select("id, class_id")
+    .eq("id", exerciseId)
+    .single();
+
+  if (!exercise) throw new Error("Exercise not found");
+
+  if (exercise.class_id) {
+    const { data: membership } = await supabase
+      .from("class_memberships")
+      .select("student_id")
+      .eq("class_id", exercise.class_id)
+      .eq("student_id", user.id)
+      .single();
+
+    if (!membership) throw new Error("Not authorized for this exercise");
+  }
+
   // Get current attempt count
   const { count } = await supabase
     .from("submissions")

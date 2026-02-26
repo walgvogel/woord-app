@@ -111,11 +111,12 @@ export async function checkAndAwardBadges(studentId: string) {
   }
 
   if (toAward.length > 0) {
-    await supabase.from("student_badges").insert(
+    await supabase.from("student_badges").upsert(
       toAward.map((badge_id) => ({
         student_id: studentId,
         badge_id,
-      }))
+      })),
+      { onConflict: "student_id,badge_id", ignoreDuplicates: true }
     );
   }
 }

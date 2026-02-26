@@ -26,13 +26,21 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Profile is created automatically by the database trigger.
-      // Determine destination based on existing profile role.
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", data.user.id)
-        .single();
+      // Profile is created by DB trigger — may need a moment to propagate.
+      // Retry up to 3 times with short delays.
+      let profile: { role: string } | null = null;
+      for (let i = 0; i < 3; i++) {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", data.user.id)
+          .single();
+        if (p) {
+          profile = p;
+          break;
+        }
+        await new Promise((r) => setTimeout(r, 200));
+      }
 
       const destination =
         profile?.role === "teacher"

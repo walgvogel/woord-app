@@ -119,6 +119,8 @@ CREATE INDEX IF NOT EXISTS idx_exercises_lesson      ON exercises(lesson_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_class       ON exercises(class_id);
 CREATE INDEX IF NOT EXISTS idx_class_memberships_student ON class_memberships(student_id);
 CREATE INDEX IF NOT EXISTS idx_feedback_submission   ON feedback(submission_id);
+CREATE INDEX IF NOT EXISTS idx_submissions_student_exercise ON submissions(student_id, exercise_id);
+CREATE INDEX IF NOT EXISTS idx_feedback_submission_teacher  ON feedback(submission_id, teacher_id);
 
 -- ============================================================
 -- STORAGE BUCKET
