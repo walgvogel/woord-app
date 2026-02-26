@@ -73,14 +73,14 @@ export async function checkAndAwardBadges(studentId: string) {
       }
 
       case "cursus-voltooid": {
-        // All 5 modules completed
-        const { data: modules } = await supabase
+        // All modules completed (dynamically counted)
+        const { data: allModules } = await supabase
           .from("modules")
           .select("id, lessons(exercises(id))");
 
-        if (modules) {
+        if (allModules && allModules.length > 0) {
           let allDone = true;
-          for (const mod of modules) {
+          for (const mod of allModules) {
             const exerciseIds = (mod.lessons as { exercises: { id: string }[] }[])
               .flatMap((l) => l.exercises.map((e) => e.id));
             if (exerciseIds.length === 0) continue;

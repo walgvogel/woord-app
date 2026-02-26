@@ -1,7 +1,7 @@
 -- ============================================================
 -- Audio Woord – Seed Data (echte cursusinhoud, pagina's 1–20)
 -- Run AFTER schema.sql in Supabase SQL Editor
--- LET OP: verwijdert alle bestaande modules/lessen/oefeningen + submissions
+-- VEILIG: gebruikt ON CONFLICT (upsert) — bestaande submissions blijven bewaard
 -- ============================================================
 
 -- ============================================================
@@ -12,7 +12,7 @@ INSERT INTO badges (slug, name, description, icon_emoji) VALUES
   ('eerste-stem',    'Eerste Stem',     'Eerste opname ingediend',                  '🎤'),
   ('doorzetter',     'Doorzetter',      '3 pogingen op één oefening',               '🔁'),
   ('module-meester', 'Module Meester',  'Alle oefeningen van een module voltooid',  '⚡'),
-  ('cursus-voltooid','Cursus Voltooid', 'Alle modules afgerond',                    '🏆'),
+  ('cursus-voltooid','Cursus Voltooid', 'Alle modules volledig afgerond',            '🏆'),
   ('luisteraar',     'Luisteraar',      '10 verschillende oefeningen voltooid',     '👂')
 ON CONFLICT (slug) DO UPDATE
   SET name = EXCLUDED.name,
@@ -20,17 +20,12 @@ ON CONFLICT (slug) DO UPDATE
       icon_emoji = EXCLUDED.icon_emoji;
 
 -- ============================================================
--- VERWIJDER BESTAANDE CURSUSDATA (cascade naar lessen/oefeningen/submissions)
--- ============================================================
-
-DELETE FROM modules;
-
--- ============================================================
--- MODULE 1: Een krachtige stem
+-- MODULES (upsert op slug)
 -- ============================================================
 
 INSERT INTO modules (slug, title, icon, "order") VALUES
-  ('krachtige-stem', 'Een krachtige stem', '💪', 1);
+  ('krachtige-stem', 'Een krachtige stem', '💪', 1)
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, icon = EXCLUDED.icon, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 1.1: Oefening baart kunst
@@ -67,14 +62,16 @@ Zie je een **O**, **U** of een tweeklank waar een O of U in zit? Tuit dan je lip
 ![klinkers O en U](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/uitspraak-klinkers-4.png)
 
 ![gymnast](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-gymnast.png)$$, 1
-FROM modules WHERE slug = 'krachtige-stem';
+FROM modules WHERE slug = 'krachtige-stem'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Pittigheidstest', 'self_assessment',
   'Lees de theorie over pittigheid. Spreek daarna luid de klinkers A – E – I – O – U uit en let op je mondstanden. Overdrijf bewust. Voel je het verschil? Klik op "Markeer als voltooid" wanneer je klaar bent.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de O en OO', 'recording',
@@ -85,7 +82,8 @@ Zin 1 (O): De stomme hond sprong op de ronde ton.
 Zin 2 (OO): Oom Joop kookte rode kool voor zijn zonen.
 Zin 3 (Mix): De grote koster kocht een rode klok.$$, 2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de U en UU', 'recording',
@@ -96,7 +94,8 @@ Zin 1 (U): De mug zoemt heel druk in de volle bus.
 Zin 2 (UU): Ruud tuurt over de stenen muur naar het vuur.
 Zin 3 (Mix): De zure buurman stuitert op de kruk.$$, 3
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de OE', 'recording',
@@ -105,7 +104,8 @@ $$Woorden: boek, stoel, koe, snoep, roepen
 Zin 1: De boer zoekt een goede schoen voor zijn voet.
 Zin 2: De moedige poedel roept naar de koeien.$$, 4
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de EU', 'recording',
@@ -114,7 +114,8 @@ $$Woorden: neus, deur, reus, leuk, kleur
 Zin 1: De reus leunt tegen de gesloten deur.
 Zin 2: De speurder snuift de geur van de nieuwe beuk.$$, 5
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de UI', 'recording',
@@ -123,7 +124,8 @@ $$Woorden: huis, muis, uil, buiten, fluit
 Zin 1: Buiten huilt de bruine uil bij het huis.
 Zin 2: De luie muis kruipt door het vuile luik.$$, 6
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Lipronding: de AU en OU', 'recording',
@@ -133,7 +135,8 @@ Woorden: koud, hout, blauw, pauw, vrouw
 Zin 1: De blauwe pauw loopt in de kou over het hout.
 Zin 2: De trotse vrouw vouwt de gouden mouw.$$, 7
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'oefening-baart-kunst'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 1.2: Pittig pittiger pittigst
@@ -146,139 +149,166 @@ $$Tongtwisters zijn de fitness voor je tong en lippen. Begin altijd **langzaam**
 > **Tip:** Overdrijf de medeklinkers. Zorg dat je ze vooraan in je mond vormt.
 
 ![peper](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-peper.png)$$, 2
-FROM modules WHERE slug = 'krachtige-stem';
+FROM modules WHERE slug = 'krachtige-stem'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 -- 26 klassieke tongtwisters – elk apart opnemen
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'De klokkenluider luidt lang luidruchtige klokken', 'recording', NULL, 1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'De prins spreekt slecht spaans', 'recording', NULL, 2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'De kaka van een alpaca kan stevig stinken', 'recording', NULL, 3
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Die schaar knipt knap stroef', 'recording', NULL, 4
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Bas bakt blauwe boterkoeken', 'recording', NULL, 5
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Frits vindt visfrietjes vreselijk vies', 'recording', NULL, 6
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Rare ruige rapers rapen ruw rode raapjes en radijzen', 'recording', NULL, 7
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Ik ga mijn kersenpittenkussentje pakken', 'recording', NULL, 8
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Vier vieze varkens vreten veel vuilnis', 'recording', NULL, 9
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Ik schrijf scheef in mijn schrift', 'recording', NULL, 10
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Kleine kippen pikken kleine kuikens', 'recording', NULL, 11
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Bedek het bed met het dekbeddek', 'recording', NULL, 12
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Tien tamme tijgers trommelen op tinnen trommels', 'recording', NULL, 13
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'De poes kotst in de postzak', 'recording', NULL, 14
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Het heldere hemd hangt hoog', 'recording', NULL, 15
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'De kapster kapt de krullenbol op de kruk', 'recording', NULL, 16
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Nona kocht negen nieuwe nachtlampjes voor Nina''s nachttafel', 'recording', NULL, 17
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Papa pakt de blauwe platte bakpan', 'recording', NULL, 18
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Zeven schone schotse schaatsers schaatsen een scheve schaats in scheveningen', 'recording', NULL, 19
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Als achter vliegen vliegen vliegen, vliegen vliegen vliegen achterna', 'recording', NULL, 20
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Jeukt jouw jeukende neus ook zo als mijn jeukende neus jeukt', 'recording', NULL, 21
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Drie dove domme dromedarissen', 'recording', NULL, 22
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Als apen elkaar na-apen, apen apen apen na', 'recording', NULL, 23
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Max mixt de whiskey met de whiskeymixer', 'recording', NULL, 24
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Drie, droge, doeken', 'recording', NULL, 25
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Boterklontje boterklontje boterklontje', 'recording', NULL, 26
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- 9 articulatieoefeningen – elke Deel als één opname
 
@@ -299,7 +329,8 @@ Damme rammen dammen damp
 Tamme rammen tamme tamp
 Nummer rumoer nummer namp$$, 27
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 2: De labiale explosies', 'recording',
@@ -310,7 +341,8 @@ Prachtige prinsen proppen pruimen proost
 Blauwe bloemen bloeien blij en bloot
 Platte plannen plakken plots en plooit$$, 28
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 3: De "Ie-Aa-Oe" glijbaan', 'recording',
@@ -322,7 +354,8 @@ Pieren palen poeder poe
 Lier en laren loeren loe
 Zielen zalen zoenen zoe$$, 29
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 4: Ritmisch staccato', 'recording',
@@ -330,7 +363,8 @@ $$Tiedelie, tiedelie, tiedelie tie tie
 Ziedaar de, ziedaar de, ziedaar de zee zee
 Wie was daar, wie was daar, wie was daar, wee wee$$, 30
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 5: De "Knisper-Knasper" tongbrekers', 'recording',
@@ -344,7 +378,8 @@ Stelen stallen stoelen stelen sties
 Spitsen spotten spinnenspotten spies
 Stelen stallen stoelen stelen sties$$, 31
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 6: De korte klappen', 'recording',
@@ -356,7 +391,8 @@ Lik de lip, la! Lik de lip, la! Lik de lip, la, la!
 Kit de kat, ka! Kit de kat, ka! Kit de kat, ka, ka!
 Pit de pat, pa! Pit de pat, pa! Pit de pat, pa, pa!$$, 32
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 7: Het "Otteke" ritme', 'recording',
@@ -365,7 +401,8 @@ Motteke motten, motteke motten, motteke motten Miel
 Gokker de gokker, gokker de gokker, gokker de gokker Giek
 Topper de topper, topper de topper, topper de topper Tiep$$, 33
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 8: De vochtige clusters', 'recording',
@@ -374,7 +411,8 @@ Stok de dokken drip drip, stok de dokken drip drip drip
 Stuk de dukken drep drep, stuk de dukken drep drep drep
 Steile dijken driep driep, steile dijken driep driep driep$$, 34
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Deel 9: De grote finale', 'recording',
@@ -388,7 +426,8 @@ Vloer en vodden, stoken en doddlen, stop stop stee
 Snebber en snavel, grabbel en navel, stop stop stee
 Red wel die dikke dop, dikke dee!$$, 35
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tongtwisters'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 1.3: Tips voor uitspraak
@@ -420,7 +459,8 @@ Oefen niet alleen de klanken, maar begrijp ook wat je leest. Als je de betekenis
 Lees voor de spiegel. Kijk hoe je mond en tong bewegen. Zie je dat je klanken volledig vormt? Overdrijf gerust je mondstanden.
 
 ![spiegel](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-spiegel.png)$$, 3
-FROM modules WHERE slug = 'krachtige-stem';
+FROM modules WHERE slug = 'krachtige-stem'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Opnemen en terugluisteren', 'recording',
@@ -429,14 +469,16 @@ SELECT l.id, 'Opnemen en terugluisteren', 'recording',
 "De kapster kapt de krullenbol op de kruk terwijl de kaka van de alpaca stevig stinkt."',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tips-uitspraak';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tips-uitspraak'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Spiegeltje spiegeltje', 'self_assessment',
   'Lees een tekst naar keuze voor de spiegel. Kijk hoe je mond en tong bewegen. Zie je dat je klanken volledig vormt? Overdrijf bewust je mondstanden. Klik op "Markeer als voltooid" wanneer je klaar bent.',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'tips-uitspraak';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'tips-uitspraak'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 1.4: Houding
@@ -459,21 +501,24 @@ $$## Wat is een goede houding?
 ![houding pinguïn](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-houding-1.png)
 
 ![houding mens](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/stem-houding-2.png)$$, 4
-FROM modules WHERE slug = 'krachtige-stem';
+FROM modules WHERE slug = 'krachtige-stem'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Houding controleren', 'self_assessment',
   'Ga staan en controleer elk punt: voeten evenwijdig met heupen, gewicht niet op de tenen, rug recht maar ontspannen, schouders los, kaak ontspannen. Kan je piano spelen met je tenen? Zo ja, dan sta je goed. Klik op "Markeer als voltooid" wanneer je de houding gecheckt hebt.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'krachtige-stem' AND l.slug = 'houding';
+WHERE m.slug = 'krachtige-stem' AND l.slug = 'houding'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ============================================================
 -- MODULE 2: Ademhaling & Stemgebruik
 -- ============================================================
 
 INSERT INTO modules (slug, title, icon, "order") VALUES
-  ('ademhaling', 'Ademhaling & Stemgebruik', '🫁', 2);
+  ('ademhaling', 'Ademhaling & Stemgebruik', '🫁', 2)
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, icon = EXCLUDED.icon, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 2.1: Buikademhaling
@@ -523,14 +568,16 @@ Hetzelfde maar nu met een zin: **"Sta op!"** Laat weer los bij de P van "op". Oo
 > - Voel je spanning? Geeuw of laat je onderkaak hangen.
 > - Begin nooit te happen naar adem — je hebt genoeg lucht in je longen.
 > - Laat je mond na het spreken open zodat de lucht terug naar je buik kan stromen.$$, 1
-FROM modules WHERE slug = 'ademhaling';
+FROM modules WHERE slug = 'ademhaling'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Bewust worden van je ademhaling', 'self_assessment',
   'Ga achtereenvolgens staan, zitten en liggen. Leg steeds een hand op je buik en een hand op je borst. Adem rustig. Welke hand beweegt het meest? Probeer de ademhaling naar je buik te brengen. Klik op "Markeer als voltooid" wanneer je de oefening gedaan hebt.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'buikademhaling';
+WHERE m.slug = 'ademhaling' AND l.slug = 'buikademhaling'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Zeg HOP!', 'recording',
@@ -543,7 +590,8 @@ SELECT l.id, 'Zeg HOP!', 'recording',
 Voel je de lucht bij elke P terug naar je buik stromen?',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'buikademhaling';
+WHERE m.slug = 'ademhaling' AND l.slug = 'buikademhaling'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 2.2: Het middenrif
@@ -569,7 +617,8 @@ Voel je dat korte duwtje bij je buik? Goed bezig! Dit noemen we: 'het loslaten v
 > **Zeg: "FFFFF!" – Niet té lang, maar wel stevig. Laat daarna weer los.**
 
 Voel je je middenrif bewegen in je buik? Dan gebruik je je middenrif goed! Pittig spreken en spreken met je middenrif zijn aan elkaar gelinkt!$$, 2
-FROM modules WHERE slug = 'ademhaling';
+FROM modules WHERE slug = 'ademhaling'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Kssssh en Pfff', 'self_assessment',
@@ -580,7 +629,8 @@ SELECT l.id, 'Kssssh en Pfff', 'self_assessment',
 Herhaal 5 keer. Klik op "Markeer als voltooid" wanneer je het gevoel herkent.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'middenrif';
+WHERE m.slug = 'ademhaling' AND l.slug = 'middenrif'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'FFFFF! – middenrifoefening', 'recording',
@@ -592,7 +642,8 @@ SELECT l.id, 'FFFFF! – middenrifoefening', 'recording',
 Herhaal elke oefening 3 keer. Voel je middenrif bewegen?',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'middenrif';
+WHERE m.slug = 'ademhaling' AND l.slug = 'middenrif'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 2.3: Spreek met je eigen stem
@@ -627,7 +678,8 @@ Je lichaam is je klankkast, zoals bij een gitaar. Laat je stem meetrillen in je 
 > - Je stem klinkt rustiger, warmer en krachtiger
 > - Je voorkomt dat je stem schel of geknepen klinkt
 > - Je straalt meer rust en zelfvertrouwen uit$$, 3
-FROM modules WHERE slug = 'ademhaling';
+FROM modules WHERE slug = 'ademhaling'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Toonhoogte vinden', 'recording',
@@ -639,7 +691,8 @@ SELECT l.id, 'Toonhoogte vinden', 'recording',
 Klinkt je stem ontspannen en natuurlijk?',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'eigen-stem';
+WHERE m.slug = 'ademhaling' AND l.slug = 'eigen-stem'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Resonantie voelen', 'self_assessment',
@@ -651,7 +704,8 @@ SELECT l.id, 'Resonantie voelen', 'self_assessment',
 Voel je het verschil in warmte en volume? Klik op "Markeer als voltooid".',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'eigen-stem';
+WHERE m.slug = 'ademhaling' AND l.slug = 'eigen-stem'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 2.4: Zoemoefening
@@ -688,7 +742,8 @@ Zeg de dagen van de week: **"MMMMmaandag – dinsdag – woensdag…"**
 Neem steeds een korte ademhaling tussen elke dag (dus niet alles op één adem zeggen!). Voel of je buik mee beweegt.
 
 ![bij](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/adem-bij.png)$$, 4
-FROM modules WHERE slug = 'ademhaling';
+FROM modules WHERE slug = 'ademhaling'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Stappen 1–3: Mmmm-klank', 'recording',
@@ -700,7 +755,8 @@ SELECT l.id, 'Stappen 1–3: Mmmm-klank', 'recording',
 Herhaal 5 keer na elkaar.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'zoemoefening';
+WHERE m.slug = 'ademhaling' AND l.slug = 'zoemoefening'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Stap 4: MMMMmaandag', 'recording',
@@ -711,7 +767,8 @@ Zeg: "MMMMmaandag – dinsdag – woensdag – donderdag – vrijdag – zaterda
 Neem steeds een korte ademhaling na elke dag. Niet alles op één adem! Voel of je buik mee beweegt. Herhaal de hele reeks 3 keer.',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'zoemoefening';
+WHERE m.slug = 'ademhaling' AND l.slug = 'zoemoefening'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 2.5: Luid gaan met je stem
@@ -727,7 +784,8 @@ Zet die nooit op je kaak, schouders, strottenhoofd of nek! Last van spanning? Ge
 > **Probeer op een feest ook niet over maar DOOR de muziek te spreken.**
 
 ![tennis](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/adem-tennis.png)$$, 5
-FROM modules WHERE slug = 'ademhaling';
+FROM modules WHERE slug = 'ademhaling'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Luid maar ontspannen', 'recording',
@@ -740,14 +798,16 @@ SELECT l.id, 'Luid maar ontspannen', 'recording',
 Ga van normaal volume naar presentatietoon. Voel je dat de kracht vanuit je middenrif komt?',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'ademhaling' AND l.slug = 'luid-gaan';
+WHERE m.slug = 'ademhaling' AND l.slug = 'luid-gaan'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ============================================================
 -- MODULE 3: Een verzorgde uitspraak
 -- ============================================================
 
 INSERT INTO modules (slug, title, icon, "order") VALUES
-  ('uitspraak', 'Een verzorgde uitspraak', '🗣️', 3);
+  ('uitspraak', 'Een verzorgde uitspraak', '🗣️', 3)
+ON CONFLICT (slug) DO UPDATE SET title = EXCLUDED.title, icon = EXCLUDED.icon, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 3.1: Mondstanden – klinkers
@@ -808,7 +868,8 @@ $$Elke klinker vraagt om een andere mondstand. Twee sleutelwoorden: **openen** e
 - **ij / ei:** je begint bij de [i], glijdt naar de [j]
 - **ou / au:** je start bij de [o], glijdt naar de [w]
 - **ui:** je begint bij de [u], glijdt naar de [j]$$, 1
-FROM modules WHERE slug = 'uitspraak';
+FROM modules WHERE slug = 'uitspraak'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klinker A – mondstand oefenen', 'recording',
@@ -819,7 +880,8 @@ Zeg: "aap – aarde – aan – bad – gat – kat – nat – pat – rat – 
 Herhaal de reeks 3 keer. Overdrijf de mondstand bewust.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klinker E – mondstand oefenen', 'recording',
@@ -830,7 +892,8 @@ Zeg: "pet – bed – met – net – set – vet – lek – hek – keel – v
 Herhaal de reeks 3 keer.',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klinker I – mondstand oefenen', 'recording',
@@ -841,7 +904,8 @@ Zeg: "vis – pit – bit – dit – fit – hit – kit – list – mist – 
 Herhaal de reeks 3 keer.',
   3
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klinker O – ontronden', 'recording',
@@ -852,7 +916,8 @@ Zeg: "oog – oor – ook – boot – root – soot – voor – door – hoor 
 Herhaal de reeks 3 keer. Let op: tuit je lippen bij elke O.',
   4
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klinker U – ontronden', 'recording',
@@ -863,7 +928,8 @@ Zeg: "put – mut – hut – nut – muts – buts – kuip – buik – tuin �
 Herhaal de reeks 3 keer.',
   5
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Tweeklanken: ij, ou, ui', 'recording',
@@ -876,7 +942,8 @@ ui: "ui – huis – muis – tuin – buiten – fluiten – kuiken – buik"
 Spreek elke reeks 2 keer op.',
   6
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers';
+WHERE m.slug = 'uitspraak' AND l.slug = 'mondstanden-klinkers'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 3.2: Stemassimilatie
@@ -929,7 +996,8 @@ Wanneer je woorden los van elkaar uitspreekt, klinkt je stem haperend of geforce
 **!! Let op:** Woorden die beginnen met een klinker zijn vaak het risico. Daar "kap" je sneller.
 
 ![kapper](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/uitspraak-kappen.png)$$, 2
-FROM modules WHERE slug = 'uitspraak';
+FROM modules WHERE slug = 'uitspraak'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Leestekens markeren', 'self_assessment',
@@ -939,7 +1007,8 @@ SELECT l.id, 'Leestekens markeren', 'self_assessment',
 Lees de tekst daarna luidop met die markeringen. Klinkt het duidelijker? Klik op "Markeer als voltooid" wanneer je dit gedaan hebt.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie';
+WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Doffe -n weglaten', 'recording',
@@ -955,7 +1024,8 @@ Spreek daarna de zin op: "De drollen van de dollen lagen verspreid over de natte
 Let op: als er een klinker volgt, blijft de -n wel staan!',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie';
+WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Kappen vermijden', 'recording',
@@ -968,7 +1038,8 @@ SELECT l.id, 'Kappen vermijden', 'recording',
 Let op: woorden die beginnen met een klinker zijn het risico. Spreek elke zin 3 keer op.',
   3
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie';
+WHERE m.slug = 'uitspraak' AND l.slug = 'stemassimilatie'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 -- ----------------------------------------------------------
 -- Les 3.3: Klemtonen en intonatie
@@ -1017,7 +1088,8 @@ Laat de punten horen door ze erbij te denken. Als de mededeling af is, moet je d
 Blijf doorspreken tot het einde van de zin. Laat de zin niet uitdoven door aan het einde te stil te gaan praten of door het laatste woord uit te rekken.
 
 ![kaars](https://lwynieygbodsizrzksqw.supabase.co/storage/v1/object/public/illustrations/uitspraak-kaars.png)$$, 3
-FROM modules WHERE slug = 'uitspraak';
+FROM modules WHERE slug = 'uitspraak'
+ON CONFLICT (module_id, slug) DO UPDATE SET title = EXCLUDED.title, content = EXCLUDED.content, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Klemtoon variëren', 'recording',
@@ -1031,7 +1103,8 @@ SELECT l.id, 'Klemtoon variëren', 'recording',
 Laat het verschil in betekenis duidelijk horen.',
   1
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'intonatie';
+WHERE m.slug = 'uitspraak' AND l.slug = 'intonatie'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";
 
 INSERT INTO exercises (lesson_id, title, type, instructions, "order")
 SELECT l.id, 'Intonatie beoordelen', 'self_assessment',
@@ -1042,4 +1115,5 @@ SELECT l.id, 'Intonatie beoordelen', 'self_assessment',
 Klik op "Markeer als voltooid" na je zelfevaluatie.',
   2
 FROM lessons l JOIN modules m ON m.id = l.module_id
-WHERE m.slug = 'uitspraak' AND l.slug = 'intonatie';
+WHERE m.slug = 'uitspraak' AND l.slug = 'intonatie'
+ON CONFLICT (lesson_id, title) DO UPDATE SET type = EXCLUDED.type, instructions = EXCLUDED.instructions, "order" = EXCLUDED."order";

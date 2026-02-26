@@ -56,14 +56,18 @@ CREATE TABLE IF NOT EXISTS lessons (
   UNIQUE (module_id, slug)
 );
 
--- Exercises
+-- Exercises (lesson_id nullable: class exercises have no lesson)
 CREATE TABLE IF NOT EXISTS exercises (
   id           UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-  lesson_id    UUID REFERENCES lessons(id) ON DELETE CASCADE NOT NULL,
+  lesson_id    UUID REFERENCES lessons(id) ON DELETE CASCADE,
   title        TEXT NOT NULL,
   type         TEXT NOT NULL CHECK (type IN ('recording', 'reading', 'self_assessment')),
   instructions TEXT,
-  "order"      INTEGER NOT NULL
+  "order"      INTEGER NOT NULL,
+  class_id     UUID REFERENCES classes(id) ON DELETE CASCADE,
+  created_by   UUID REFERENCES profiles(id),
+  created_at   TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE (lesson_id, title)  -- enables upsert for curriculum exercises
 );
 
 -- Submissions
@@ -74,6 +78,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   attempt_number INTEGER NOT NULL DEFAULT 1,
   audio_url      TEXT,
   self_score     INTEGER CHECK (self_score >= 0 AND self_score <= 5),
+  reflection_text TEXT,
   completed_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -111,6 +116,7 @@ CREATE INDEX IF NOT EXISTS idx_submissions_student   ON submissions(student_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_exercise  ON submissions(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_lessons_module        ON lessons(module_id);
 CREATE INDEX IF NOT EXISTS idx_exercises_lesson      ON exercises(lesson_id);
+CREATE INDEX IF NOT EXISTS idx_exercises_class       ON exercises(class_id);
 CREATE INDEX IF NOT EXISTS idx_class_memberships_student ON class_memberships(student_id);
 CREATE INDEX IF NOT EXISTS idx_feedback_submission   ON feedback(submission_id);
 
@@ -190,10 +196,33 @@ CREATE POLICY "memberships: teacher reads own class"
     )
   );
 
--- modules, lessons, exercises: public read (curriculum)
+-- modules, lessons: public read (curriculum)
 CREATE POLICY "modules: public read"   ON modules    FOR SELECT USING (true);
 CREATE POLICY "lessons: public read"   ON lessons    FOR SELECT USING (true);
-CREATE POLICY "exercises: public read" ON exercises  FOR SELECT USING (true);
+
+-- exercises: curriculum (no class_id) is public, class exercises scoped to members
+CREATE POLICY "exercises: global read" ON exercises
+  FOR SELECT USING (class_id IS NULL);
+
+CREATE POLICY "exercises: class read" ON exercises
+  FOR SELECT USING (
+    class_id IS NOT NULL AND (
+      EXISTS (SELECT 1 FROM class_memberships cm WHERE cm.class_id = exercises.class_id AND cm.student_id = auth.uid())
+      OR EXISTS (SELECT 1 FROM classes c WHERE c.id = exercises.class_id AND c.teacher_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "exercises: teacher insert" ON exercises
+  FOR INSERT WITH CHECK (
+    class_id IS NOT NULL AND created_by = auth.uid()
+    AND EXISTS (SELECT 1 FROM classes c WHERE c.id = exercises.class_id AND c.teacher_id = auth.uid())
+  );
+
+CREATE POLICY "exercises: teacher update own" ON exercises
+  FOR UPDATE USING (created_by = auth.uid());
+
+CREATE POLICY "exercises: teacher delete own" ON exercises
+  FOR DELETE USING (created_by = auth.uid());
 
 -- submissions: student CRUD own, teacher reads for class students
 CREATE POLICY "submissions: student CRUD own"
@@ -226,6 +255,30 @@ CREATE POLICY "feedback: student reads own submission"
 
 -- badges: public read
 CREATE POLICY "badges: public read" ON badges FOR SELECT USING (true);
+
+-- ============================================================
+-- AUTO-CREATE PROFILE ON SIGN-UP
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (id, role, display_name, avatar_url)
+  VALUES (
+    NEW.id,
+    'student',
+    COALESCE(NEW.raw_user_meta_data ->> 'full_name', NEW.raw_user_meta_data ->> 'name'),
+    NEW.raw_user_meta_data ->> 'avatar_url'
+  )
+  ON CONFLICT (id) DO NOTHING;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
 -- student_badges: student reads own, teacher reads class students
 CREATE POLICY "student_badges: student reads own"

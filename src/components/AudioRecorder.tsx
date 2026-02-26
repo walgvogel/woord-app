@@ -33,6 +33,8 @@ export default function AudioRecorder({
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
 
+  const MAX_DURATION = 600; // 10 minutes in seconds
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -41,6 +43,14 @@ export default function AudioRecorder({
 
   const startRecording = async () => {
     setError(null);
+
+    if (typeof MediaRecorder === "undefined") {
+      setError(
+        "Je browser ondersteunt geen audio-opname. Probeer Chrome, Firefox of Safari 14.5+."
+      );
+      return;
+    }
+
     setState("requesting");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -72,7 +82,17 @@ export default function AudioRecorder({
       mediaRecorder.start(250);
       setState("recording");
       setElapsed(0);
-      timerRef.current = setInterval(() => setElapsed((e) => e + 1), 1000);
+      timerRef.current = setInterval(() => {
+        setElapsed((e) => {
+          if (e + 1 >= MAX_DURATION) {
+            // Auto-stop at 10 minutes
+            mediaRecorder.stop();
+            stream.getTracks().forEach((t) => t.stop());
+            clearInterval(timerRef.current!);
+          }
+          return e + 1;
+        });
+      }, 1000);
     } catch {
       setError(
         "Kon geen toegang krijgen tot de microfoon. Controleer je browserinstellingen."
@@ -184,9 +204,9 @@ export default function AudioRecorder({
             POGING {attemptNumber}
           </h3>
           {state === "recording" && (
-            <span className="flex items-center gap-2 text-red-500 text-sm font-bold animate-pulse-pink">
+            <span className={`flex items-center gap-2 text-sm font-bold animate-pulse-pink ${elapsed >= MAX_DURATION - 60 ? "text-red-600" : "text-red-500"}`}>
               <span className="w-2 h-2 rounded-full bg-red-500" />
-              {formatTime(elapsed)}
+              {formatTime(elapsed)} / {formatTime(MAX_DURATION)}
             </span>
           )}
         </div>
