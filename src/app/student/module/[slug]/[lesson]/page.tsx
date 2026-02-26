@@ -130,6 +130,13 @@ export default async function LessonPage({
               blockquote: ({ children }) => (
                 <div className="callout">{children}</div>
               ),
+              img: ({ src, alt }) => (
+                <img
+                  src={src}
+                  alt={alt ?? ""}
+                  style={{ backgroundColor: "white", borderRadius: "0.75rem" }}
+                />
+              ),
             }}
           >
             {lesson.content}
