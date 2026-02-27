@@ -131,11 +131,27 @@ export default async function LessonPage({
                 <div className="callout">{children}</div>
               ),
               img: ({ src, alt }) => (
-                <img
-                  src={src}
-                  alt={alt ?? ""}
-                  style={{ backgroundColor: "white", borderRadius: "0.75rem" }}
-                />
+                <span
+                  style={{
+                    display: "block",
+                    backgroundColor: "white",
+                    borderRadius: "0.75rem",
+                    position: "relative",
+                    zIndex: 1,
+                    overflow: "hidden",
+                    clear: "both",
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={alt ?? ""}
+                    style={{
+                      display: "block",
+                      maxWidth: "100%",
+                      borderRadius: "0.75rem",
+                    }}
+                  />
+                </span>
               ),
             }}
           >
